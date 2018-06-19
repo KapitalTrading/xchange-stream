@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.CompletableEmitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +66,7 @@ public abstract class NettyStreamingService<T> {
     private Channel webSocketChannel;
     private Duration retryDuration;
     private Duration connectionTimeout;
-    private final NioEventLoopGroup eventLoopGroup;
+    private volatile NioEventLoopGroup eventLoopGroup;
     protected Map<String, Subscription> channels = new ConcurrentHashMap<>();
     private boolean compressedMessages = false;
 
@@ -82,7 +84,6 @@ public abstract class NettyStreamingService<T> {
             this.retryDuration = retryDuration;
             this.connectionTimeout = connectionTimeout;
             this.uri = new URI(apiUrl);
-            this.eventLoopGroup = new NioEventLoopGroup();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Error parsing URI " + apiUrl, e);
         }
@@ -129,6 +130,7 @@ public abstract class NettyStreamingService<T> {
                         this::messageHandler);
 
                 Bootstrap b = new Bootstrap();
+                eventLoopGroup = new NioEventLoopGroup(2);
                 b.group(eventLoopGroup)
                         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, java.lang.Math.toIntExact(connectionTimeout.toMillis()))
                         .channel(NioSocketChannel.class)
@@ -145,11 +147,11 @@ public abstract class NettyStreamingService<T> {
                                 handlers.add(new HttpClientCodec());
                                 if (compressedMessages) handlers.add(WebSocketClientCompressionHandler.INSTANCE);
                                 handlers.add(new HttpObjectAggregator(8192));
-                                
+
                                 if (clientExtensionHandler != null) {
                                   handlers.add(clientExtensionHandler);
                                 }
-                                
+
                                 handlers.add(handler);
                                 p.addLast(handlers.toArray(new ChannelHandler[handlers.size()]));
                             }
@@ -162,18 +164,29 @@ public abstract class NettyStreamingService<T> {
                             if (f.isSuccess()) {
                                 completable.onComplete();
                             } else {
-                                completable.onError(f.cause());
+                                handleError(completable, f.cause());
                             }
                         });
                     } else {
-                        completable.onError(future.cause());
+                        handleError(completable, future.cause());
                     }
 
                 });
             } catch (Exception throwable) {
-                completable.onError(throwable);
+                handleError(completable, throwable);
             }
         });
+    }
+
+    protected void handleError(CompletableEmitter completable, Throwable t) {
+        isManualDisconnect = true;
+        ChannelFuture disconnect = webSocketChannel.disconnect();
+        disconnect.addListener(f -> {
+            if(f.isSuccess()) {
+                isManualDisconnect = false;
+            }
+        });
+        completable.onError(t);
     }
 
     public Completable disconnect() {
@@ -183,8 +196,14 @@ public abstract class NettyStreamingService<T> {
                 CloseWebSocketFrame closeFrame = new CloseWebSocketFrame();
                 webSocketChannel.writeAndFlush(closeFrame).addListener(future -> {
                     channels = new ConcurrentHashMap<>();
-                    completable.onComplete();
+                    eventLoopGroup.shutdownGracefully(2, 30, TimeUnit.SECONDS).addListener(f -> {
+                      LOG.info("Disconnected");
+                      completable.onComplete();
+                    });
                 });
+            } else {
+              LOG.warn("Disconnect called but already disconnected");
+              completable.onComplete();
             }
         });
     }
@@ -285,7 +304,12 @@ public abstract class NettyStreamingService<T> {
 
 
     protected void handleChannelMessage(String channel, T message) {
-        ObservableEmitter<T> emitter = channels.get(channel).emitter;
+        NettyStreamingService<T>.Subscription subscription = channels.get(channel);
+        if (subscription == null) {
+            LOG.debug("Channel has been closed {}.", channel);
+            return;
+        }
+        ObservableEmitter<T> emitter = subscription.emitter;
         if (emitter == null) {
             LOG.debug("No subscriber for channel {}.", channel);
             return;
@@ -295,7 +319,12 @@ public abstract class NettyStreamingService<T> {
     }
 
     protected void handleChannelError(String channel, Throwable t) {
-        ObservableEmitter<T> emitter = channels.get(channel).emitter;
+        NettyStreamingService<T>.Subscription subscription = channels.get(channel);
+        if (subscription == null) {
+            LOG.debug("Channel {} has been closed.", channel);
+            return;
+        }
+        ObservableEmitter<T> emitter = subscription.emitter;
         if (emitter == null) {
             LOG.debug("No subscriber for channel {}.", channel);
             return;
@@ -325,14 +354,16 @@ public abstract class NettyStreamingService<T> {
             } else {
                 super.channelInactive(ctx);
                 LOG.info("Reopening websocket because it was closed by the host");
-                final Completable c = connect()
+                eventLoopGroup.shutdownGracefully(2, 30, TimeUnit.SECONDS).addListener(f -> {
+                    final Completable c = connect()
                         .doOnError(t -> LOG.warn("Problem with reconnect", t))
                         .retryWhen(new RetryWithDelay(retryDuration.toMillis()))
                         .doOnComplete(() -> {
                             LOG.info("Resubscribing channels");
                             resubscribeChannels();
                         });
-                c.subscribe();
+                    c.subscribe();
+                });
             }
         }
     }
