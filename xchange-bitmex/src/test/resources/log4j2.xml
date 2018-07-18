@@ -7,6 +7,8 @@
     </Appenders>
     <Loggers>
         <Logger name="io.netty" level="warn"/>
+        <Logger name="org.knowm.xchange" level="DEBUG"/>
+        <Logger name="si.mazi.rescu" level="TRACE"/>
         <Root level="INFO">
             <AppenderRef ref="Console"/>
         </Root>
