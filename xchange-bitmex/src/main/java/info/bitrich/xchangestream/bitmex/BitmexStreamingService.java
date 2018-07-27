@@ -45,7 +45,7 @@ public class BitmexStreamingService extends JsonNettyStreamingService {
 
     @Override
     protected void handleMessage(JsonNode message) {
-        LOG.info("got new msg = {}", message);
+        LOG.debug("got new msg = {}", message);
         if (message.has("info") || message.has("success")) {
             return;
         }
@@ -54,7 +54,8 @@ public class BitmexStreamingService extends JsonNettyStreamingService {
             LOG.error("Error with message: " + error);
             return;
         }
-        dms.handleMessage(message);
+
+        if (dms.handleMessage(message)) return;
         super.handleMessage(message);
     }
 
@@ -81,7 +82,7 @@ public class BitmexStreamingService extends JsonNettyStreamingService {
         String stringToDigest = "GET/realtime" + expires;
         String signature = bitmexDigester.digestString(stringToDigest);
 
-        customHeaders.add("api-nonce", expires);
+        customHeaders.add("api-expires", expires);
         customHeaders.add("api-key", apiKey);
         customHeaders.add("api-signature", signature);
         return customHeaders;
