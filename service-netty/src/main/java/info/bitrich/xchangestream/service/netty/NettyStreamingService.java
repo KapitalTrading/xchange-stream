@@ -55,7 +55,7 @@ public abstract class NettyStreamingService<T> {
     private final int maxFramePayloadLength;
     private final URI uri;
     private boolean isManualDisconnect = false;
-    private boolean conenctedSuccessfully = false;
+    private boolean connectedSuccessfully = false;
     private Channel webSocketChannel;
     private Duration retryDuration;
     private Duration connectionTimeout;
@@ -92,9 +92,14 @@ public abstract class NettyStreamingService<T> {
         }
     }
 
+    protected URI getUri() {
+        return uri;
+    }
+
     public Completable connect() {
         return Completable.create(completable -> {
             try {
+                URI uri = getUri();
                 LOG.info("Connecting to {}://{}:{}{}", uri.getScheme(), uri.getHost(), uri.getPort(), uri.getPath());
                 String scheme = uri.getScheme() == null ? "ws" : uri.getScheme();
 
@@ -192,7 +197,7 @@ public abstract class NettyStreamingService<T> {
             reconnFailEmitters.forEach(emitter -> emitter.onNext(t));
         }).retryWhen(new RetryWithDelay(retryDuration.toMillis()))
           .doOnComplete(() -> {
-            conenctedSuccessfully = true;
+            connectedSuccessfully = true;
             LOG.warn("Resubscribing channels");
             resubscribeChannels();
 
@@ -210,7 +215,7 @@ public abstract class NettyStreamingService<T> {
 
     public Completable disconnect() {
         isManualDisconnect = true;
-        conenctedSuccessfully = false;
+        connectedSuccessfully = false;
         return Completable.create(completable -> {
             if (webSocketChannel.isOpen()) {
                 CloseWebSocketFrame closeFrame = new CloseWebSocketFrame();
@@ -370,7 +375,7 @@ public abstract class NettyStreamingService<T> {
                 isManualDisconnect = false;
             } else {
                 super.channelInactive(ctx);
-                if (conenctedSuccessfully) {
+                if (connectedSuccessfully) {
                     LOG.info("Reopening websocket because it was closed by the host");
                     final Completable c = connect();
                     c.subscribe();

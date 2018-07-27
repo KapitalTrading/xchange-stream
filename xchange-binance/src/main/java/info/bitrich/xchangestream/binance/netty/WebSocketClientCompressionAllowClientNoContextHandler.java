@@ -18,11 +18,13 @@ public final class WebSocketClientCompressionAllowClientNoContextHandler extends
             new WebSocketClientCompressionAllowClientNoContextHandler();
 
     private WebSocketClientCompressionAllowClientNoContextHandler() {
-        super(new PerMessageDeflateClientExtensionHandshaker(6, ZlibCodecFactory.isSupportingWindowSizeAndMemLevel(),
-                        MAX_WINDOW_SIZE, true, true),
+        super(
+// new PerMessageDeflateClientExtensionHandshaker(6, ZlibCodecFactory.isSupportingWindowSizeAndMemLevel(),
+//                        MAX_WINDOW_SIZE, true, true),
         new PerMessageDeflateClientExtensionHandshaker(6, ZlibCodecFactory.isSupportingWindowSizeAndMemLevel(),
-                        MAX_WINDOW_SIZE, true, false),
-                new DeflateFrameClientExtensionHandshaker(false),
-                new DeflateFrameClientExtensionHandshaker(true));
+                        MAX_WINDOW_SIZE, true, false)
+//                new DeflateFrameClientExtensionHandshaker(false),
+//                new DeflateFrameClientExtensionHandshaker(true)
+ );
     }
 }

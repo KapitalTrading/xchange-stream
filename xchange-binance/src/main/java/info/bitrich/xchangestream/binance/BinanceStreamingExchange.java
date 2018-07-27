@@ -4,12 +4,15 @@ import info.bitrich.xchangestream.core.ProductSubscription;
 import info.bitrich.xchangestream.core.StreamingExchange;
 import info.bitrich.xchangestream.core.StreamingMarketDataService;
 import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Observable;
+import org.knowm.xchange.ExchangeSpecification;
 import org.knowm.xchange.binance.BinanceExchange;
 import org.knowm.xchange.binance.service.BinanceMarketDataService;
-import org.knowm.xchange.binance.service.BinanceMarketDataServiceRaw;
+import org.knowm.xchange.binance.service.BinanceTradeService;
 import org.knowm.xchange.currency.CurrencyPair;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,6 +21,7 @@ public class BinanceStreamingExchange extends BinanceExchange implements Streami
     private static final String API_BASE_URI = "wss://stream.binance.com:9443/";
 
     private BinanceStreamingService streamingService;
+    private BinanceUserDataStreamingService userDataStreamingService;
     private BinanceStreamingMarketDataService streamingMarketDataService;
 
     public BinanceStreamingExchange() {
@@ -41,10 +45,15 @@ public class BinanceStreamingExchange extends BinanceExchange implements Streami
 
         ProductSubscription subscriptions = args[0];
         streamingService = createStreamingService(subscriptions);
-        applyStreamingSpecification(getExchangeSpecification(), streamingService);
+        userDataStreamingService = createUserDataStreamingService();
         streamingMarketDataService = new BinanceStreamingMarketDataService(streamingService, (BinanceMarketDataService) marketDataService);
-        return streamingService.connect()
-                .doOnComplete(() -> streamingMarketDataService.openSubscriptions(subscriptions));
+        Completable connect = streamingService.connect();
+
+        Completable completable = connect.doOnComplete(() -> streamingMarketDataService.openSubscriptions(subscriptions));
+        if (userDataStreamingService != null) {
+            completable = completable.andThen(userDataStreamingService.connect());
+        }
+        return completable;
     }
 
     @Override
@@ -77,7 +86,20 @@ public class BinanceStreamingExchange extends BinanceExchange implements Streami
 
     private BinanceStreamingService createStreamingService(ProductSubscription subscription) {
         String path = API_BASE_URI + "stream?streams=" + buildSubscriptionStreams(subscription);
-        return new BinanceStreamingService(path, subscription);
+        BinanceStreamingService binanceStreamingService = new BinanceStreamingService(path, subscription);
+        applyStreamingSpecification(exchangeSpecification, binanceStreamingService);
+        return binanceStreamingService;
+    }
+
+    @Nullable
+    private BinanceUserDataStreamingService createUserDataStreamingService() {
+        ExchangeSpecification exchangeSpecification = getExchangeSpecification();
+        if (exchangeSpecification != null && exchangeSpecification.getApiKey() != null && exchangeSpecification.getSecretKey() != null) {
+            BinanceUserDataStreamingService binanceUserDataStreamingService = new BinanceUserDataStreamingService(API_BASE_URI, (BinanceTradeService) tradeService);
+            applyStreamingSpecification(exchangeSpecification, binanceUserDataStreamingService);
+            return binanceUserDataStreamingService;
+        }
+        return null;
     }
 
     public static String buildSubscriptionStreams(ProductSubscription subscription) {

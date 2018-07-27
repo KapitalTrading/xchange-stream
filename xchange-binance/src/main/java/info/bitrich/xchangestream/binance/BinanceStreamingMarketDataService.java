@@ -161,7 +161,7 @@ public class BinanceStreamingMarketDataService implements StreamingMarketDataSer
                             cachedTransactionData.add(depth);
 
                             if (initialSnapshot == null) {
-                                initialSnapshot = marketDataService.getBinanceOrderbook(currencyPair, 100);
+                                initialSnapshot = marketDataService.getBinanceOrderbook(currencyPair, 5);
                             }
                             long lastUpdateId = initialSnapshot.lastUpdateId;
                             if (lastUpdateId + 1 < cachedTransactionData.first().getFirstUpdateId()) {
