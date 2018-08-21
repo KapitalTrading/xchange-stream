@@ -8,6 +8,9 @@ import java.math.BigDecimal;
  * @author Nikita Belenkiy on 25/07/2018.
  */
 public class BinanceExecutionReport {
+
+        public static final String EVENT_TYPE = "executionReport";
+
         /**
          * "e": "executionReport",        // Event type
          */
@@ -142,7 +145,7 @@ public class BinanceExecutionReport {
          * "Z": "0.00000000"              // Cumulative quote asset transacted quantity
          */
         @JsonProperty("Z")
-        private long cumAssetQty;
+        private BigDecimal cumAssetQty;
 
 
         public String getEventType() {
@@ -353,11 +356,11 @@ public class BinanceExecutionReport {
                 this.orderCreationTime = orderCreationTime;
         }
 
-        public long getCumAssetQty() {
+        public BigDecimal getCumAssetQty() {
                 return cumAssetQty;
         }
 
-        public void setCumAssetQty(long cumAssetQty) {
+        public void setCumAssetQty(BigDecimal cumAssetQty) {
                 this.cumAssetQty = cumAssetQty;
         }
 

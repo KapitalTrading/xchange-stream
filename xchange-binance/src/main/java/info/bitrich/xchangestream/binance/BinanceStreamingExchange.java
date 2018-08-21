@@ -2,9 +2,7 @@ package info.bitrich.xchangestream.binance;
 
 import info.bitrich.xchangestream.core.ProductSubscription;
 import info.bitrich.xchangestream.core.StreamingExchange;
-import info.bitrich.xchangestream.core.StreamingMarketDataService;
 import io.reactivex.Completable;
-import io.reactivex.CompletableSource;
 import io.reactivex.Observable;
 import org.knowm.xchange.ExchangeSpecification;
 import org.knowm.xchange.binance.BinanceExchange;
@@ -46,14 +44,19 @@ public class BinanceStreamingExchange extends BinanceExchange implements Streami
         ProductSubscription subscriptions = args[0];
         streamingService = createStreamingService(subscriptions);
         userDataStreamingService = createUserDataStreamingService();
-        streamingMarketDataService = new BinanceStreamingMarketDataService(streamingService, (BinanceMarketDataService) marketDataService);
+        streamingMarketDataService = new BinanceStreamingMarketDataService(streamingService, (BinanceMarketDataService) marketDataService, userDataStreamingService);
         Completable connect = streamingService.connect();
 
-        Completable completable = connect.doOnComplete(() -> streamingMarketDataService.openSubscriptions(subscriptions));
         if (userDataStreamingService != null) {
-            completable = completable.andThen(userDataStreamingService.connect());
+            connect = connect.mergeWith(userDataStreamingService.connect());
         }
-        return completable;
+
+        return connect.doOnComplete(() -> {
+            streamingMarketDataService.openSubscriptions(subscriptions);
+            if (userDataStreamingService != null) {
+                streamingMarketDataService.openUserSubscriptions();
+            }
+        });
     }
 
     @Override
@@ -80,7 +83,7 @@ public class BinanceStreamingExchange extends BinanceExchange implements Streami
     }
 
     @Override
-    public StreamingMarketDataService getStreamingMarketDataService() {
+    public BinanceStreamingMarketDataService getStreamingMarketDataService() {
         return streamingMarketDataService;
     }
 

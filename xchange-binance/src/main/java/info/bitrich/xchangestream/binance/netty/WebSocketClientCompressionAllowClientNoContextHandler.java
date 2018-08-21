@@ -1,9 +1,7 @@
 package info.bitrich.xchangestream.binance.netty;
 
 import io.netty.channel.ChannelHandler;
-import io.netty.handler.codec.compression.ZlibCodecFactory;
 import io.netty.handler.codec.http.websocketx.extensions.WebSocketClientExtensionHandler;
-import io.netty.handler.codec.http.websocketx.extensions.compression.DeflateFrameClientExtensionHandshaker;
 import io.netty.handler.codec.http.websocketx.extensions.compression.PerMessageDeflateClientExtensionHandshaker;
 
 import static io.netty.handler.codec.http.websocketx.extensions.compression.PerMessageDeflateServerExtensionHandshaker.MAX_WINDOW_SIZE;
@@ -21,7 +19,7 @@ public final class WebSocketClientCompressionAllowClientNoContextHandler extends
         super(
 // new PerMessageDeflateClientExtensionHandshaker(6, ZlibCodecFactory.isSupportingWindowSizeAndMemLevel(),
 //                        MAX_WINDOW_SIZE, true, true),
-        new PerMessageDeflateClientExtensionHandshaker(6, ZlibCodecFactory.isSupportingWindowSizeAndMemLevel(),
+        new PerMessageDeflateClientExtensionHandshaker(6,false/* ZlibCodecFactory.isSupportingWindowSizeAndMemLevel()*/,
                         MAX_WINDOW_SIZE, true, false)
 //                new DeflateFrameClientExtensionHandshaker(false),
 //                new DeflateFrameClientExtensionHandshaker(true)

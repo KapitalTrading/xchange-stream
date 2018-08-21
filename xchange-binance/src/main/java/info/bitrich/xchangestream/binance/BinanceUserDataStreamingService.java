@@ -2,8 +2,12 @@ package info.bitrich.xchangestream.binance;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import info.bitrich.xchangestream.binance.dto.user.BinanceAccountUpdate;
+import info.bitrich.xchangestream.binance.dto.user.BinanceExecutionReport;
+import info.bitrich.xchangestream.binance.netty.WebSocketClientCompressionAllowClientNoContextHandler;
 import info.bitrich.xchangestream.service.netty.JsonNettyStreamingService;
 import info.bitrich.xchangestream.service.netty.StreamingObjectMapperHelper;
+import io.netty.handler.codec.http.websocketx.extensions.WebSocketClientExtensionHandler;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import org.knowm.xchange.binance.service.BinanceTradeService;
@@ -34,9 +38,9 @@ public class BinanceUserDataStreamingService extends JsonNettyStreamingService {
     public void messageHandler(String message) {
         try {
             JsonNode node = objectMapper.readTree(message);
-            super.messageHandler(message);
+            super.handleMessage(node);
         } catch (IOException e) {
-            logger.error("Error  marsign json {}",message,  e);
+            logger.error("Error  parsing json {}",message,  e);
         }
     }
 
@@ -77,7 +81,14 @@ public class BinanceUserDataStreamingService extends JsonNettyStreamingService {
     }
 
     @Override
-    protected String getChannelNameFromMessage(JsonNode message) throws IOException {
+    protected String getChannelNameFromMessage(JsonNode message) {
+        String e = message.get("e").asText();
+        if (e.equals(BinanceAccountUpdate.EVENT_TYPE)) {
+            return BinanceAccountUpdate.EVENT_TYPE;
+        }
+        if (e.equals(BinanceExecutionReport.EVENT_TYPE)) {
+            return BinanceExecutionReport.EVENT_TYPE;
+        }
         return null;
     }
 
@@ -90,4 +101,11 @@ public class BinanceUserDataStreamingService extends JsonNettyStreamingService {
     public String getUnsubscribeMessage(String channelName) throws IOException {
         return null;
     }
+
+    @Override
+    protected WebSocketClientExtensionHandler getWebSocketClientExtensionHandler() {
+        return WebSocketClientCompressionAllowClientNoContextHandler.INSTANCE;
+    }
+
+
 }

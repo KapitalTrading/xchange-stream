@@ -48,8 +48,10 @@ import java.util.List;
  * @author Nikita Belenkiy on 25/07/2018.
  */
 public class BinanceAccountUpdate {
+
+    public static final String EVENT_TYPE = "outboundAccountInfo";
     /**
-     * "e": "executionReport",        // Event type
+     * "e": "outboundAccountInfo",        // Event type
      */
     @JsonProperty("e")
     private String eventType;
@@ -72,7 +74,7 @@ public class BinanceAccountUpdate {
     /**
      * "s": 0,                       // Seller commission rate (bips)
      */
-    @JsonProperty("m")
+    @JsonProperty("s")
     private long sellerCommissionRate;
     /**
      * "T": true,                    // Can trade?
