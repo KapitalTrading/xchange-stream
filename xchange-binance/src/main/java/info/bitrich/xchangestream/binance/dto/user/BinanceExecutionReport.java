@@ -1,6 +1,8 @@
 package info.bitrich.xchangestream.binance.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.knowm.xchange.binance.dto.trade.OrderStatus;
+import org.knowm.xchange.binance.dto.trade.OrderType;
 
 import java.math.BigDecimal;
 
@@ -14,139 +16,156 @@ public class BinanceExecutionReport {
         /**
          * "e": "executionReport",        // Event type
          */
-        @JsonProperty("e")
         private String eventType;
         /**
          * "E": 1499405658658,            // Event time
          */
-        @JsonProperty("E")
         private long eventTime;
         /**
          * "s": "ETHBTC",                 // Symbol
          */
-        @JsonProperty("s")
         private String symbol;
         /**
          * "c": "mUvoqJxFIILMdfAW5iGSOW", // Client order ID
          */
-        @JsonProperty("c")
         private String clOrdID;
         /**
          * "S": "BUY",                    // Side
          */
-        @JsonProperty("S")
         private String side;
         /**
          * "o": "LIMIT",                  // Order type
          */
-        @JsonProperty("o")
-        private String orderType;
+        private OrderType orderType;
         /**
          * "f": "GTC",                    // Time in force
          */
-        @JsonProperty("f")
         private String timeIfForce;
         /**
          * "q": "1.00000000",             // Order quantity
          */
-        @JsonProperty("q")
         private BigDecimal orderQuantity;
         /**
          * "p": "0.10264410",             // Order price
          */
-        @JsonProperty("p")
         private BigDecimal price;
         /**
          * "P": "0.00000000",             // Stop price
          */
-        @JsonProperty("P")
         private BigDecimal stopPrice;
         /**
          * "F": "0.00000000",             // Iceberg quantity
          */
-        @JsonProperty("F")
         private BigDecimal icebergQuantity;
         /**
          * "C": "null",                   // Original client order ID; This is the ID of the order being canceled
          */
-        @JsonProperty("C")
         private String origClOrdID;
         /**
          * "x": "NEW",                    // Current execution type
          */
-        @JsonProperty("x")
         private String execType;
         /**
          * "X": "NEW",                    // Current order status
          */
-        @JsonProperty("X")
-        private String ordStatus;
+        private OrderStatus ordStatus;
         /**
          * "r": "NONE",                   // Order reject reason; will be an error code.
          */
-        @JsonProperty("r")
         private String orderRejectReason;
         /**
          * "i": 4293153,                  // Order ID
          */
-        @JsonProperty("i")
         private String orderID;
         /**
          * "l": "0.00000000",             // Last executed quantity
          */
-        @JsonProperty("l")
         private BigDecimal lastQty;
         /**
          * "z": "0.00000000",             // Cumulative filled quantity
          */
-        @JsonProperty("z")
         private BigDecimal cumFillQty;
         /**
          * "L": "0.00000000",             // Last executed price
          */
-        @JsonProperty("L")
         private BigDecimal lastPx;
         /**
          * "n": "0",                      // Commission amount
          */
-        @JsonProperty("n")
         private BigDecimal commissionAmt;
         /**
          * "N": null,                     // Commission asset
          */
-        @JsonProperty("N")
         private BigDecimal commissionAsset;
         /**
          * "T": 1499405658657,            // Transaction time
          */
-        @JsonProperty("T")
         private long transactTime;
         /**
          * "t": -1,                       // Trade ID
          */
-        @JsonProperty("t")
         private long tradeId;
         /**
          * "w": true,                     // Is the order working? Stops will have
          */
-        @JsonProperty("w")
         private boolean working;
         /**
          * "m": false,                    // Is this trade the maker side?
          */
-        @JsonProperty("m")
         private boolean maker;
         /**
          * "O": 1499405658657,            // Order creation time
          */
-        @JsonProperty("O")
         private long orderCreationTime;
         /**
          * "Z": "0.00000000"              // Cumulative quote asset transacted quantity
          */
-        @JsonProperty("Z")
         private BigDecimal cumAssetQty;
 
+        public BinanceExecutionReport(@JsonProperty("e")String eventType, @JsonProperty("E") long eventTime,
+                                      @JsonProperty("s") String symbol, @JsonProperty("c") String clOrdID,
+                                      @JsonProperty("S") String side,
+                                      @JsonProperty("o") OrderType orderType, @JsonProperty("f") String timeIfForce,
+                                      @JsonProperty("q") BigDecimal orderQuantity, @JsonProperty("p") BigDecimal price,
+                                      @JsonProperty("P") BigDecimal stopPrice, @JsonProperty("F") BigDecimal icebergQuantity,
+                                      @JsonProperty("C") String origClOrdID, @JsonProperty("x") String execType,
+                                      @JsonProperty("X") OrderStatus ordStatus, @JsonProperty("r") String orderRejectReason,
+                                      @JsonProperty("i") String orderID, @JsonProperty("l") BigDecimal lastQty,
+                                      @JsonProperty("z") BigDecimal cumFillQty, @JsonProperty("L") BigDecimal lastPx,
+                                      @JsonProperty("n") BigDecimal commissionAmt,
+                                      @JsonProperty("N") BigDecimal commissionAsset, @JsonProperty("T") long transactTime,
+                                      @JsonProperty("t") long tradeId, @JsonProperty("w") boolean working,
+                                      @JsonProperty("m") boolean maker, @JsonProperty("O") long orderCreationTime,
+                                      @JsonProperty("Z") BigDecimal cumAssetQty) {
+
+                this.eventType = eventType;
+                this.eventTime = eventTime;
+                this.symbol = symbol;
+                this.clOrdID = "null".equals(clOrdID)?null:clOrdID;
+                this.side = side;
+                this.orderType = orderType;
+                this.timeIfForce = timeIfForce;
+                this.orderQuantity = orderQuantity;
+                this.price = price;
+                this.stopPrice = stopPrice;
+                this.icebergQuantity = icebergQuantity;
+                this.origClOrdID = origClOrdID;
+                this.execType = execType;
+                this.ordStatus = ordStatus;
+                this.orderRejectReason = orderRejectReason;
+                this.orderID = orderID;
+                this.lastQty = lastQty;
+                this.cumFillQty = cumFillQty;
+                this.lastPx = lastPx;
+                this.commissionAmt = commissionAmt;
+                this.commissionAsset = commissionAsset;
+                this.transactTime = transactTime;
+                this.tradeId = tradeId;
+                this.working = working;
+                this.maker = maker;
+                this.orderCreationTime = orderCreationTime;
+                this.cumAssetQty = cumAssetQty;
+        }
 
         public String getEventType() {
                 return eventType;
@@ -188,11 +207,11 @@ public class BinanceExecutionReport {
                 this.side = side;
         }
 
-        public String getOrderType() {
+        public OrderType getOrderType() {
                 return orderType;
         }
 
-        public void setOrderType(String orderType) {
+        public void setOrderType(OrderType orderType) {
                 this.orderType = orderType;
         }
 
@@ -252,11 +271,11 @@ public class BinanceExecutionReport {
                 this.execType = execType;
         }
 
-        public String getOrdStatus() {
+        public OrderStatus getOrdStatus() {
                 return ordStatus;
         }
 
-        public void setOrdStatus(String ordStatus) {
+        public void setOrdStatus(OrderStatus ordStatus) {
                 this.ordStatus = ordStatus;
         }
 
