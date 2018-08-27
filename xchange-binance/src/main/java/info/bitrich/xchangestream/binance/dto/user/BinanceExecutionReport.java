@@ -1,8 +1,10 @@
 package info.bitrich.xchangestream.binance.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.knowm.xchange.binance.dto.trade.OrderSide;
 import org.knowm.xchange.binance.dto.trade.OrderStatus;
 import org.knowm.xchange.binance.dto.trade.OrderType;
+import org.knowm.xchange.binance.dto.trade.TimeInForce;
 
 import java.math.BigDecimal;
 
@@ -32,7 +34,7 @@ public class BinanceExecutionReport {
         /**
          * "S": "BUY",                    // Side
          */
-        private String side;
+        private OrderSide side;
         /**
          * "o": "LIMIT",                  // Order type
          */
@@ -124,7 +126,7 @@ public class BinanceExecutionReport {
 
         public BinanceExecutionReport(@JsonProperty("e")String eventType, @JsonProperty("E") long eventTime,
                                       @JsonProperty("s") String symbol, @JsonProperty("c") String clOrdID,
-                                      @JsonProperty("S") String side,
+                                      @JsonProperty("S") OrderSide side,
                                       @JsonProperty("o") OrderType orderType, @JsonProperty("f") TimeInForce timeInForce,
                                       @JsonProperty("q") BigDecimal orderQuantity, @JsonProperty("p") BigDecimal price,
                                       @JsonProperty("P") BigDecimal stopPrice, @JsonProperty("F") BigDecimal icebergQuantity,
@@ -199,11 +201,11 @@ public class BinanceExecutionReport {
                 this.clOrdID = clOrdID;
         }
 
-        public String getSide() {
+        public OrderSide getSide() {
                 return side;
         }
 
-        public void setSide(String side) {
+        public void setSide(OrderSide side) {
                 this.side = side;
         }
 
