@@ -40,7 +40,7 @@ public class BinanceExecutionReport {
         /**
          * "f": "GTC",                    // Time in force
          */
-        private String timeIfForce;
+        private String timeInForce;
         /**
          * "q": "1.00000000",             // Order quantity
          */
@@ -125,7 +125,7 @@ public class BinanceExecutionReport {
         public BinanceExecutionReport(@JsonProperty("e")String eventType, @JsonProperty("E") long eventTime,
                                       @JsonProperty("s") String symbol, @JsonProperty("c") String clOrdID,
                                       @JsonProperty("S") String side,
-                                      @JsonProperty("o") OrderType orderType, @JsonProperty("f") String timeIfForce,
+                                      @JsonProperty("o") OrderType orderType, @JsonProperty("f") String timeInForce,
                                       @JsonProperty("q") BigDecimal orderQuantity, @JsonProperty("p") BigDecimal price,
                                       @JsonProperty("P") BigDecimal stopPrice, @JsonProperty("F") BigDecimal icebergQuantity,
                                       @JsonProperty("C") String origClOrdID, @JsonProperty("x") String execType,
@@ -144,7 +144,7 @@ public class BinanceExecutionReport {
                 this.clOrdID = "null".equals(clOrdID)?null:clOrdID;
                 this.side = side;
                 this.orderType = orderType;
-                this.timeIfForce = timeIfForce;
+                this.timeInForce = timeInForce;
                 this.orderQuantity = orderQuantity;
                 this.price = price;
                 this.stopPrice = stopPrice;
@@ -215,12 +215,12 @@ public class BinanceExecutionReport {
                 this.orderType = orderType;
         }
 
-        public String getTimeIfForce() {
-                return timeIfForce;
+        public String getTimeInForce() {
+                return timeInForce;
         }
 
-        public void setTimeIfForce(String timeIfForce) {
-                this.timeIfForce = timeIfForce;
+        public void setTimeInForce(String timeInForce) {
+                this.timeInForce = timeInForce;
         }
 
         public BigDecimal getOrderQuantity() {
@@ -392,7 +392,7 @@ public class BinanceExecutionReport {
                 sb.append(", clOrdID='").append(clOrdID).append('\'');
                 sb.append(", side='").append(side).append('\'');
                 sb.append(", orderType='").append(orderType).append('\'');
-                sb.append(", timeIfForce='").append(timeIfForce).append('\'');
+                sb.append(", timeInForce='").append(timeInForce).append('\'');
                 sb.append(", orderQuantity=").append(orderQuantity);
                 sb.append(", price=").append(price);
                 sb.append(", stopPrice=").append(stopPrice);
