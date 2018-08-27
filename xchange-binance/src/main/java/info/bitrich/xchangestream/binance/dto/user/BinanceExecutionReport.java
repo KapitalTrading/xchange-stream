@@ -40,7 +40,7 @@ public class BinanceExecutionReport {
         /**
          * "f": "GTC",                    // Time in force
          */
-        private String timeInForce;
+        private TimeInForce timeInForce;
         /**
          * "q": "1.00000000",             // Order quantity
          */
@@ -125,7 +125,7 @@ public class BinanceExecutionReport {
         public BinanceExecutionReport(@JsonProperty("e")String eventType, @JsonProperty("E") long eventTime,
                                       @JsonProperty("s") String symbol, @JsonProperty("c") String clOrdID,
                                       @JsonProperty("S") String side,
-                                      @JsonProperty("o") OrderType orderType, @JsonProperty("f") String timeInForce,
+                                      @JsonProperty("o") OrderType orderType, @JsonProperty("f") TimeInForce timeInForce,
                                       @JsonProperty("q") BigDecimal orderQuantity, @JsonProperty("p") BigDecimal price,
                                       @JsonProperty("P") BigDecimal stopPrice, @JsonProperty("F") BigDecimal icebergQuantity,
                                       @JsonProperty("C") String origClOrdID, @JsonProperty("x") String execType,
@@ -215,11 +215,11 @@ public class BinanceExecutionReport {
                 this.orderType = orderType;
         }
 
-        public String getTimeInForce() {
+        public TimeInForce getTimeInForce() {
                 return timeInForce;
         }
 
-        public void setTimeInForce(String timeInForce) {
+        public void setTimeInForce(TimeInForce timeInForce) {
                 this.timeInForce = timeInForce;
         }
 
