@@ -90,7 +90,7 @@ public class BitmexOrderReplaceTest {
 
         logger.info("Replacing");
         String replacedOrderId = nosOrdId + "replace";
-        BitmexPrivateOrder replaceBPO = tradeService.replaceLimitOrder("XBTUSD", originalOrderSize.divide(BigDecimal.valueOf(2)), price, null, replacedOrderId, nosOrdId);
+        BitmexPrivateOrder replaceBPO = tradeService.replaceLimitOrder("XBTUSD", originalOrderSize.divide(BigDecimal.valueOf(2)), price, null, replacedOrderId, nosOrdId, null, null);
         logger.info("!!!!!PRIVATE_ORDER_REPLACE!!!! {}",xbtusd);
         Thread.sleep(10000);
         System.out.println();

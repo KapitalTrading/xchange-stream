@@ -161,7 +161,7 @@ public class BitmexOrderIT {
                         null,
                         orderId,
                         replaceId,
-                        clOrdId);
+                        clOrdId, null, null);
         LOG.info("Order was replaced = {}", bitmexPrivateOrder);
 
         checkPrivateOrder(orderId, testAskPrice, "5", BitmexSide.SELL, bitmexPrivateOrder);
