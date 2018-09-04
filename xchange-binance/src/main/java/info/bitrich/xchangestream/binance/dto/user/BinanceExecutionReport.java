@@ -98,7 +98,7 @@ public class BinanceExecutionReport {
         /**
          * "N": null,                     // Commission asset
          */
-        private BigDecimal commissionAsset;
+        private String commissionAsset;
         /**
          * "T": 1499405658657,            // Transaction time
          */
@@ -135,7 +135,7 @@ public class BinanceExecutionReport {
                                       @JsonProperty("i") String orderID, @JsonProperty("l") BigDecimal lastQty,
                                       @JsonProperty("z") BigDecimal cumFillQty, @JsonProperty("L") BigDecimal lastPx,
                                       @JsonProperty("n") BigDecimal commissionAmt,
-                                      @JsonProperty("N") BigDecimal commissionAsset, @JsonProperty("T") long transactTime,
+                                      @JsonProperty("N") String commissionAsset, @JsonProperty("T") long transactTime,
                                       @JsonProperty("t") long tradeId, @JsonProperty("w") boolean working,
                                       @JsonProperty("m") boolean maker, @JsonProperty("O") long orderCreationTime,
                                       @JsonProperty("Z") BigDecimal cumAssetQty) {
@@ -329,11 +329,11 @@ public class BinanceExecutionReport {
                 this.commissionAmt = commissionAmt;
         }
 
-        public BigDecimal getCommissionAsset() {
+        public String getCommissionAsset() {
                 return commissionAsset;
         }
 
-        public void setCommissionAsset(BigDecimal commissionAsset) {
+        public void setCommissionAsset(String commissionAsset) {
                 this.commissionAsset = commissionAsset;
         }
 
