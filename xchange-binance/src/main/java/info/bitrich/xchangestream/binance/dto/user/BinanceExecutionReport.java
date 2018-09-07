@@ -66,7 +66,7 @@ public class BinanceExecutionReport {
         /**
          * "x": "NEW",                    // Current execution type
          */
-        private String execType;
+        private ExecType execType;
         /**
          * "X": "NEW",                    // Current order status
          */
@@ -130,7 +130,7 @@ public class BinanceExecutionReport {
                                       @JsonProperty("o") OrderType orderType, @JsonProperty("f") TimeInForce timeInForce,
                                       @JsonProperty("q") BigDecimal orderQuantity, @JsonProperty("p") BigDecimal price,
                                       @JsonProperty("P") BigDecimal stopPrice, @JsonProperty("F") BigDecimal icebergQuantity,
-                                      @JsonProperty("C") String origClOrdID, @JsonProperty("x") String execType,
+                                      @JsonProperty("C") String origClOrdID, @JsonProperty("x") ExecType execType,
                                       @JsonProperty("X") OrderStatus ordStatus, @JsonProperty("r") String orderRejectReason,
                                       @JsonProperty("i") String orderID, @JsonProperty("l") BigDecimal lastQty,
                                       @JsonProperty("z") BigDecimal cumFillQty, @JsonProperty("L") BigDecimal lastPx,
@@ -265,11 +265,11 @@ public class BinanceExecutionReport {
                 this.origClOrdID = origClOrdID;
         }
 
-        public String getExecType() {
+        public ExecType getExecType() {
                 return execType;
         }
 
-        public void setExecType(String execType) {
+        public void setExecType(ExecType execType) {
                 this.execType = execType;
         }
 
