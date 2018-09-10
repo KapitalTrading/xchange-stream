@@ -34,6 +34,10 @@ public class BitmexStreamingMarketDataService implements StreamingMarketDataServ
 
     public BitmexStreamingMarketDataService(BitmexStreamingService streamingService) {
         this.streamingService = streamingService;
+        this.streamingService.subscribeConnectionSuccess().subscribe(o -> {
+            LOG.info("Bitmex connection succeeded. Clearing orderbooks.");
+            orderbooks.clear();
+        });
     }
 
     private String getBitmexSymbol(CurrencyPair currencyPair, Object... args) {
