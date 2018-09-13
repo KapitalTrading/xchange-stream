@@ -19,9 +19,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.util.internal.SocketUtils;
-import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
+import io.reactivex.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -332,9 +330,15 @@ public abstract class NettyStreamingService<T> {
 
 
     protected void handleChannelMessage(String channel, T message) {
-        ObservableEmitter<T> emitter = channels.get(channel).emitter;
+        Subscription subscription = channels.get(channel);
+        if (subscription == null) {
+            LOG.warn("No subscription for channel {} to handle message {}", channel, message);
+            return;
+        }
+
+        ObservableEmitter<T> emitter = subscription.emitter;
         if (emitter == null) {
-            LOG.debug("No subscriber for channel {}.", channel);
+            LOG.debug("No emitter for channel {}.", channel);
             return;
         }
 
@@ -342,8 +346,8 @@ public abstract class NettyStreamingService<T> {
     }
 
     protected void handleChannelError(String channel, Throwable t) {
-        if (!channel.contains(channel)) {
-            LOG.error("Unexpected channel's error: {}, {}.", channel, t);
+        if (!channels.containsKey(channel)) {
+            LOG.error("Unexpected channel error: {}, {}.", channel, t);
             return;
         }
         ObservableEmitter<T> emitter = channels.get(channel).emitter;
