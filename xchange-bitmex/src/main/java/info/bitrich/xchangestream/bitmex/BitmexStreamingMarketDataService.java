@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Lukas Zaoralek on 13.11.17.
@@ -73,10 +72,7 @@ public class BitmexStreamingMarketDataService implements StreamingMarketDataServ
             }
 
             return orderbook.toOrderbook();
-        }).doOnError((e) -> {
-            LOG.error("Error in {} orderbook stream. Reconnecting. Error: {}", channelName, Arrays.toString(e.getStackTrace()));
-            orderbooks.remove(instrument);
-        }).retryWhen((e) -> e.delay(1000, TimeUnit.MILLISECONDS));
+        }).doOnError(e -> orderbooks.remove(instrument));
     }
 
     public Observable<BitmexTicker> getRawTicker(CurrencyPair currencyPair, Object... args) {

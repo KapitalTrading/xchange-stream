@@ -332,7 +332,7 @@ public abstract class NettyStreamingService<T> {
     protected void handleChannelMessage(String channel, T message) {
         Subscription subscription = channels.get(channel);
         if (subscription == null) {
-            LOG.warn("No subscription for channel {} to handle message {}", channel, message);
+            LOG.debug("No subscription for channel {} to handle message {}", channel, message);
             return;
         }
 
@@ -347,7 +347,7 @@ public abstract class NettyStreamingService<T> {
 
     protected void handleChannelError(String channel, Throwable t) {
         if (!channels.containsKey(channel)) {
-            LOG.error("Unexpected channel error: {}, {}.", channel, t);
+            LOG.debug("Unexpected channel error: {}, {}.", channel, t);
             return;
         }
         ObservableEmitter<T> emitter = channels.get(channel).emitter;
