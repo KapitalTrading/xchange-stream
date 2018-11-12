@@ -45,10 +45,6 @@ public class BitmexDms {
             String cancelTime = message.get("cancelTime").asText();
             if (cancelTime.equals("0")) {
                 LOG.info("Dead man's switch disabled");
-                if (dmsDisposable != null) {
-                    dmsDisposable.dispose();
-                    dmsDisposable = null;
-                }
                 dmsCancelTime = 0;
             } else {
                 SimpleDateFormat sdf = new SimpleDateFormat(BitmexMarketDataEvent.BITMEX_TIMESTAMP_FORMAT);
@@ -79,6 +75,10 @@ public class BitmexDms {
     }
 
     public void disableDeadMansSwitch() throws IOException {
+        if (dmsDisposable != null) {
+            dmsDisposable.dispose();
+            dmsDisposable = null;
+        }
         String message = dmsMessage(0);
         service.sendMessage(message);
     }
